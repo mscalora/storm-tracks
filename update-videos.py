@@ -9,6 +9,9 @@ import urlparse
 import subprocess
 import datetime
 
+import shutil
+
+
 def file_get_contents(filename):
   with open(filename) as f:
     return f.read()
@@ -70,7 +73,7 @@ for name, id in name_to_id_map.items():
     match = re.search(r'AL\d{6}_5day_cone_with_line_\d\w*\.png', line)
     if match:
       images.append(match.group(0))
-      print match.group(0)
+      #print match.group(0)
 
   print ""
 
@@ -99,14 +102,20 @@ for name, id in name_to_id_map.items():
     else:
       files_done = file_list
 
+  last_image_path = None
+
   for num, image in enumerate(images, start=1):
 
     file_url = urlparse.urljoin(arc_folder, image)
     file_name = 'image_%03d.png' % num
     file_path = os.path.join(path, file_name)
+
+    last_image_path = file_path
+
     if image in files_done:
       pass
     else:
+      print 'Downloading', file_url
       imgr = requests.get(file_url)
       if imgr.status_code < 300:
         with open(file_path, 'wb') as output:
@@ -132,6 +141,14 @@ for name, id in name_to_id_map.items():
     subprocess.call(['convert', '-delay', '15', '-loop', '0', input_glob, '-resize', '200%',  video_path])
 
     subprocess.call(['chmod', 'ga+r', video_path])
+
+  poster_name = '%s.png' % name
+  poster_path = os.path.join(path, poster_name)
+
+  print poster_path, 'yes' if os.path.exists(poster_path) else 'no'
+  if not os.path.exists(poster_path):
+    shutil.copyfile(last_image_path, poster_path)
+    print 'copying last image to poster', last_image_path, 'to', poster_path
 
 index_path = os.path.join(root_path, 'index.html')
 raw_tmpl = file_get_contents(os.path.join(root_path, 'template.html'))
