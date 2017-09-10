@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>2017 Storm Track Videos</title>
+  <link rel="shortcut icon" href="storm.png">
+
+  <meta property="og:image" content="share.png">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+  <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css" rel="stylesheet" >
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+  <style>
+    html {
+      background: #f0f7f1;
+    }
+    body {
+      background: none;
+    }
+    .container {
+      max-width: 900px;
+      background: white;
+    }
+    h2, h3 {
+      text-align: center;
+    }
+    .row {
+      margin: 0.5em 0;
+    }
+    video {
+      max-width: 100%;
+    }
+  </style>
+  <!-- INSERT: head-bottom.html -->
+</head>
+<body>
+  <!-- INSERT: body-top.html -->
+  <div class="container">
+    <h2>{YEAR} Storm Track Videos</h2>
+    <!-- INSERT: header.html -->
+    <!--SPLIT-->
+    <div class="row">
+      <!-- INSERT: item-top.html -->
+      <h3>{STORM_NAME}</h3>
+      <video src="{YEAR}/{STORM_NAME}/{STORM_NAME}.mp4" poster="{YEAR}/{STORM_NAME}/{STORM_NAME}.png">
+      </video>
+      <!-- INSERT: item-bottom.html -->
+    </div>
+    <!--SPLIT-->
+    <!-- INSERT: footer.html -->
+  </div>
+  <script>
+    $('video').hover(function toggleControls() {
+      if (this.hasAttribute("controls")) {
+          this.removeAttribute("controls")
+      } else {
+          this.setAttribute("controls", "controls")
+      }
+    });
+  </script>
+  <!-- INSERT: body-bottom.html -->
+</body>
+</html>
