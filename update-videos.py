@@ -8,7 +8,6 @@ import json
 import urlparse
 import subprocess
 import datetime
-
 import shutil
 
 
@@ -31,7 +30,8 @@ id_to_name_map = {}
 
 r = requests.get(index_url)
 if r.status_code >= 300:
-  print 'done'
+  print 'Index was unavailable, exiting'
+  sys.exit(1)
 
 archive_html = r.content
 
@@ -52,7 +52,7 @@ for line in archive_html.splitlines():
 arc_prefix = 'http://www.nhc.noaa.gov/archive/2017/graphics/'
 
 for name, id in name_to_id_map.items():
-  print name, id
+  #print name, id
 
   path = os.path.join(out_path, name)
 
@@ -60,12 +60,8 @@ for name, id in name_to_id_map.items():
 
   ir = requests.get(arc_folder)
   if ir.status_code>=300:
-    print "No archive folder for %s" % name
+    print "No weather.gov archive folder for %s/%s %s" % (name, id, arc_folder)
     break
-
-  print ""
-  print arc_folder
-  print ""
 
   images = []
   for line in ir.content.splitlines():
@@ -73,9 +69,6 @@ for name, id in name_to_id_map.items():
     match = re.search(r'AL\d{6}_5day_cone_with_line_\d\w*\.png', line)
     if match:
       images.append(match.group(0))
-      #print match.group(0)
-
-  print ""
 
   if len(images) == 0:
     continue
@@ -115,7 +108,7 @@ for name, id in name_to_id_map.items():
     if image in files_done:
       pass
     else:
-      print 'Downloading', file_url
+      print 'Downloading new image: ', file_url
       imgr = requests.get(file_url)
       if imgr.status_code < 300:
         with open(file_path, 'wb') as output:
@@ -137,7 +130,7 @@ for name, id in name_to_id_map.items():
 
   if new_images or not os.path.exists(video_path):
     input_glob = os.path.join(path, 'image*.png')
-    print 'Creating video:', video_name
+    print 'Creating new/updated video:', video_name
     subprocess.call(['convert', '-delay', '15', '-loop', '0', input_glob, '-resize', '200%',  video_path])
 
     subprocess.call(['chmod', 'ga+r', video_path])
@@ -145,10 +138,9 @@ for name, id in name_to_id_map.items():
   poster_name = '%s.png' % name
   poster_path = os.path.join(path, poster_name)
 
-  print poster_path, 'yes' if os.path.exists(poster_path) else 'no'
   if not os.path.exists(poster_path):
     shutil.copyfile(last_image_path, poster_path)
-    print 'copying last image to poster', last_image_path, 'to', poster_path
+    print 'Copying last image to poster', last_image_path, 'to', poster_path
 
 index_path = os.path.join(root_path, 'index.html')
 raw_tmpl = file_get_contents(os.path.join(root_path, 'template.html'))
